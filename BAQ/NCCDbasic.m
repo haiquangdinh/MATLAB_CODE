@@ -1,7 +1,7 @@
-function imOut = CCDbasic(imIn1,imIn2,winSize)
+function imOut = NCCDbasic(imIn1,imIn2,winSize)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% This function performs a basic coherent change detection (NCCD)  %
+% This function performs a basic non-coherent change detection (NCCD)  %
 % operation.  The inputs are:                                          %
 %                                                                      %
 % imIn1:  First input image (reference image)                          %
@@ -13,18 +13,19 @@ function imOut = CCDbasic(imIn1,imIn2,winSize)
 %         window has dimensions (2*winSize(1)+1) x (2*winSize(2)+1)    %
 %                                                                      %
 % The output is:                                                       %
-% imOut:  The CCD coherence map.  The output values are from 0 to 1,   %
-%     with 0 indicating no coherence in the two images and 1           %
-%     indicating full coherence.                                       %
+% imOut:  The NCCD image output.  Positive values indicate departures  %
+%     (brighter intensities in the reference image) and negative       %
+%     values indicate arrivals (brighter intensities in the mission    %
+%     image).                                                          %
 %                                                                      %
 % References:                                                          %
 %   Scarborough, S. "A Challenge Problem for SAR Change Detection and  %
 %       Data Compression," SPIE Algorithms for Synthetic Aperture      %
 %       Radar Imagery XVII, Orlando, FL, April, 2010.                  %
 %                                                                      %
-%   Novak, L. "Coherent Change Detection for Multi-Polarization SAR,"  %
-%       Asilomar Conference on Circuits, Systems, and Computers,       %
-%       Pacific Grove, CA, October, 2005.                              %
+%   Novak, L. "Change Detection for Multi-Polarization, Multi-Pass     %
+%       SAR," SPIE Algorithms for Synthetic Aperture Radar Imagery XII,%
+%       Orlando, FL, March, 2005.                                      %
 %                                                                      %
 % Contact Information:                                                 %
 % Steven Scarborough and LeRoy Gorham (AFRL/RYAP)                      %
@@ -42,14 +43,15 @@ switch length(winSize)
         error('winSize must have a length of 1 or 2');
 end
 
-% Calculate the numerator of the coherence function
-num = abs(conv2(imIn1.*conj(imIn2),winFunc,'same'));
+% Calculate the magnitude squared of the input images
+p1 = abs(imIn1).^2;
+p2 = abs(imIn2).^2;
 
-% Calculate the denominator of the coherence function
-denom = sqrt(conv2(abs(imIn1).^2,winFunc,'same').*...
-    conv2(abs(imIn2).^2,winFunc,'same'));
-  
-% Calculate the coherence function
-imOut = num./denom;
+% Convolve the images with the window function
+sig1 = conv2(p1,winFunc,'same');
+sig2 = conv2(p2,winFunc,'same');
+
+% Calculate the NCCD metric
+imOut = sign(sig1-sig2) .* abs(10*log10(sig1) - 10*log10(sig2));
 
 return
