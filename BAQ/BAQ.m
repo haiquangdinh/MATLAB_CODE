@@ -1,11 +1,21 @@
 function quantData = BAQ( data,bit_rate,block_size )
-%Block Adaptive Quantization
+% Block Adaptive Quantization using blockproc function
 % x:signal
 % bit_rate : number of bit per sample: could be 2,3,4,5
 % block size : size of the block : could be 16 -> 256
 % see [1] for below specific number
+
+% The quantizer works as follow: values in vector x are considered base
+% thresholds, which will be multiplied with local standard deviation (std)
+% to yield local block thresholds. values in vector y are considered the
+% base output value , which will be multiplied with local std to yield
+% decompressed output value, when the input value fall into a certain range
+% set by thresholds in local block thresholds. The bit stream out of
+% encoder will be (1) the binary code that shows the order of the input value
+% in vector y and (2) the std of the block.
 x{1} = 0.9816; % 2 bps
 y{1} = [0.4528,1.510];
+
 x{2} = [0.5006, 1.05, 1.748]; % 3 bps
 y{2} = [0.2451, 0.756, 1.344, 2.152];
 x{3} = [0.2582, 0.5224, 0.7996, 1.099, 1.437, 1.844, 2.401]; % 4 bps
@@ -28,8 +38,11 @@ end
 
 xi = [-fliplr(x{bit_rate-1}), 0 , x{bit_rate-1}];
 yi = [-fliplr(y{bit_rate-1}), y{bit_rate-1}];
+% fun = @(block_struct) ...
+%     reshape(quantiz(block_struct.data(:),partition,codebook),size(block_struct.data));
 quantData = zeros(size(data));
 if (isreal(data)) % use if compress only I or Q
+    
     for k=1:block_size:size(data,1)
         klimit = min(k+block_size,size(data,1));
         for n=1:block_size:size(data,2)

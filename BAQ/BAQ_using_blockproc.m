@@ -32,6 +32,10 @@ y5_i = [0.0659, 0.1981, 0.3314, 0.4668, 0.6050, 0.7473, 0.8947, 1.049, 1.212, 1.
 x5 = [-fliplr(x5_i), 0, x5_i]; y5 = [-fliplr(y5_i), y5_i];
 
 %BAQ quantization
+fun = @(block_struct) ...
+    reshape(quantiz(block_struct.data(:),partition*std2(block_struct.data),...
+    codebook*std2(block_struct.data)),size(block_struct.data));
+
 for k=1:blk_size:size(testData,1)
     klimit = min(k+blk_size,size(testData,1));
     for n=1:blk_size:size(testData,2)
@@ -56,10 +60,7 @@ for k=1:blk_size:size(testData,1)
         quantData5(k:klimit,n:nlimit)= reshape(quants5,size(blk_temp));
     end
 end
-% calculate the SQNR before and after quantization
 SQNR(testData,quantData2)
-% calculate the coherence average b/t data before and after quantization
-mean2(CCDbasic(testData,quantData2,2))
 SQNR(testData,quantData3)
 SQNR(testData,quantData4)
 SQNR(testData,quantData5)

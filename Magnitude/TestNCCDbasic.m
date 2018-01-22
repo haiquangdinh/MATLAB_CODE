@@ -12,4 +12,18 @@ data = load("D:\Users\haiqu\Documents\MATLAB\SAR_DATA\VV\FP0121\c00007a283p50.ma
 % Now save a portion of SAR data , a 850 x 400 windows, to imIn1 for easy
 % to remember and then clear data variable
 imIn2 = data.SARdataOut(2000:2850-1,2950:3350-1); clear data;
-imOut = NCCDbasic( imIn1,imIn2,5 );
+[imOut,RChange] = NCCDbasic( imIn1,imIn2,2 ); 
+
+% Try a convinient detector by "A statistical and geometrical edge detector
+% for SAR image"
+% imOutC = zeros(size(imOut));
+%  for i = 1: size(imOut,1)
+%      for j = 1:size(imOut,2)
+%          if (imOut(i,j)<=1)
+%              imOutC(i,j)=imOut(i,j);
+%          else
+%              imOutC(i,j) = 1/imOut(i,j);
+%          end
+%      end
+%  end
+ imshow(imOut), figure, imshow(RChange)
