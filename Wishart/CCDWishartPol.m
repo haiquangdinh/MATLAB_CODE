@@ -43,7 +43,7 @@ imOut = -1/numel(winFunc)*log(num./denom);
 end
 
 function detOut = detMultiDimension(data)
-    detOut = zeros([size(data,1),size(data,21)]);
+    detOut = zeros([size(data,1),size(data,2)]);
     for p=1:size(data,1)
         for q=1:size(data,2)
             detOut(p,q) = det(squeeze(data(p,q,:,:)));
@@ -52,7 +52,7 @@ function detOut = detMultiDimension(data)
 end
 
 function detOut = detMultiDimensionXY(dataX,dataY)
-    detOut = zeros([size(dataX,1),size(dataX,21)]);
+    detOut = zeros([size(dataX,1),size(dataX,2)]);
     for p=1:size(dataX,1)
         for q=1:size(dataX,2)
             detOut(p,q) = det((squeeze(dataX(p,q,:,:)) + squeeze(dataY(p,q,:,:)))/2);
@@ -67,10 +67,11 @@ function PCMout = PCMim(data,winFunc)
     % for each pixel single look
     for p=1:size(data,1)
         for q=1:size(data,2)
+            % make a Pauli vector
             k(p,q,:) = [data(p,q,1)+data(p,q,2),...
                 data(p,q,1)-data(p,q,2),...
                 2*data(p,q,3)]';
-            PCMoutS(p,q,:,:)=1/2*k(p,q)*transpose(k(p,q));
+            PCMoutS(p,q,:,:)=1/2*k(p,q)*ctranspose(k(p,q));
         end
     end
     % Calculate multi look by average over a winFunc window
