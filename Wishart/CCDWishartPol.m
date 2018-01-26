@@ -38,7 +38,7 @@ num = detMultiDimensionXY(PCMimIn1,PCMimIn2);
 denom = sqrt(detMultiDimension(PCMimIn1).*detMultiDimension(PCMimIn2));
   
 % Calculate the coherence function
-imOut = -1/numel(winFunc)*log(num./denom);
+imOut = 2*log(num./denom);
 
 end
 
@@ -71,7 +71,7 @@ function PCMout = PCMim(data,winFunc)
             k(p,q,:) = [data(p,q,1)+data(p,q,2),...
                 data(p,q,1)-data(p,q,2),...
                 2*data(p,q,3)]';
-            PCMoutS(p,q,:,:)=1/2*k(p,q)*ctranspose(k(p,q));
+            PCMoutS(p,q,:,:)=1/2*squeeze(k(p,q,:))*ctranspose(squeeze(k(p,q,:)));
         end
     end
     % Calculate multi look by average over a winFunc window
